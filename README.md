@@ -42,3 +42,5 @@ docker-compose up -d
 ### 📡 API 문서
 - 📖 [Swagger API 문서](http://localhost:8080/swagger-ui.html)  
   → 로컬 실행 후 접근 가능 (※ 현재 미구현 상태입니다)
+- 📖 [공통 Response 형식](docs/response.md)  
+  → 공통 응답 형식(성공/실패) 및 에러 핸들링 구조
