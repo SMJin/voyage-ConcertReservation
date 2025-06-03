@@ -29,7 +29,7 @@ docker-compose up -d
 - 📝 [시나리오 및 요구사항 요약 분석](docs/requirement-analysis.md)  
   → 서비스 배경, 기능 흐름, 사용자 관점의 시나리오를 정리한 문서입니다.
 
-### 🧱 시스템 설계
+### 🧱 시스템 설계 (초안)
 - 🏗 [아키텍처 구조](docs/architecture.md)  
   → 클린 아키텍처 및 모듈 구조 등 시스템 전반 설계 구조를 설명합니다.
 - 🗃 [ERD](docs/erd.md)  
@@ -44,3 +44,7 @@ docker-compose up -d
   → 로컬 실행 후 접근 가능 (※ 현재 미구현 상태입니다)
 - 📖 [공통 Response 형식](docs/response.md)  
   → 공통 응답 형식(성공/실패) 및 에러 핸들링 구조
+
+### 🐝 단위 기능별 다이어그램 및 ERD
+###### 시스템 설계 (상세)
+- 🍯[콘서트 조회](docs/diagram-erd/read-consert.md)
