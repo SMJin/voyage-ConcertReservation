@@ -22,6 +22,10 @@ public class ApiResponse<T> {
         return ApiResponse.of(true, message, data);
     }
 
+    public static <T> ApiResponse<T> fail(String message) {
+        return ApiResponse.of(false, message, null);
+    }
+
     public static <T> ApiResponse<T> fail(String message, T data) {
         return ApiResponse.of(false, message, data);
     }
