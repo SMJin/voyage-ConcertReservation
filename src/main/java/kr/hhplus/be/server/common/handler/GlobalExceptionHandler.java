@@ -5,6 +5,8 @@ import kr.hhplus.be.server.common.response.success.ApiResponse;
 import kr.hhplus.be.server.common.response.error.ValidationErrorResponse;
 import kr.hhplus.be.server.common.response.error.type.ErrorType;
 import kr.hhplus.be.server.common.response.error.ValidationErrorDetail;
+import kr.hhplus.be.server.common.util.MessageUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,7 +18,10 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final MessageUtil messageUtil;
 
     /**
      * @Valid 유효성 검증 실패 처리
@@ -35,7 +40,8 @@ public class GlobalExceptionHandler {
                 .errors(errors)
                 .build();
 
-        return ResponseEntity.badRequest().body(ApiResponse.fail("입력값 검증 실패", response));
+        String message = messageUtil.get("error.validation");
+        return ResponseEntity.badRequest().body(ApiResponse.fail(message, response));
     }
 
     /**
@@ -52,9 +58,10 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponse<String>> handleCustomException(CustomException ex) {
-        log.warn("CustomException 발생: {}", ex.getMessage());
+        String message = messageUtil.get(ex.getMessageCode());
+        log.warn("CustomException 발생: {}", message);
         return ResponseEntity.status(ex.getStatus())
-                .body(ApiResponse.fail(ex.getMessage()));
+                .body(ApiResponse.fail(message));
     }
 
     /**

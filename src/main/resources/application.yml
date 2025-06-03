@@ -3,6 +3,9 @@ spring:
     name: hhplus
   profiles:
     active: local
+  messages:
+    basename: messages
+    encoding: UTF-8
   datasource:
     name: HangHaePlusDataSource
     type: com.zaxxer.hikari.HikariDataSource
