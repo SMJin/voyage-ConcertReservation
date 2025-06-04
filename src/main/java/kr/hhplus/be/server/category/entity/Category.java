@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.concert.entity;
+package kr.hhplus.be.server.category.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

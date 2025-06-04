@@ -1,10 +1,10 @@
-package kr.hhplus.be.server.concert.entity;
+package kr.hhplus.be.server.concert_category.entity;
 
 import jakarta.persistence.*;
-import kr.hhplus.be.server.concert.entity.key.ConcertCategoryId;
+import kr.hhplus.be.server.category.entity.Category;
+import kr.hhplus.be.server.concert.entity.Concert;
+import kr.hhplus.be.server.concert_category.entity.key.ConcertCategoryId;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "concert_category")
@@ -26,8 +26,5 @@ public class ConcertCategory {
     @MapsId("categoryId")
     @JoinColumn(name = "category_id")
     private Category category;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
 
 }

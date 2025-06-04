@@ -19,7 +19,7 @@ public class Concert {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
+    private String name;
     private LocalDateTime date;
     private String venue;
     private int price;

@@ -45,7 +45,7 @@ stateDiagram-v2
 | 컬럼명         | 타입           | 제약조건           | 설명       |
 |-------------|--------------|----------------|----------|
 | id          | BIGINT       | PK, Auto       | 콘서트 ID   |
-| title       | VARCHAR(255) | NOT NULL       | 콘서트 제목   |
+| name        | VARCHAR(255) | NOT NULL       | 콘서트 제목   |
 | date        | DATETIME     | NOT NULL       | 콘서트 일시   |
 | venue       | VARCHAR(255) | NOT NULL       | 공연 장소    |
 | price       | INT          | NOT NULL       | 기본 티켓 가격 |
@@ -70,7 +70,7 @@ erDiagram
 
     CONCERT {
         BIGINT id PK
-        STRING title
+        STRING name
         DATE date
         STRING venue
         INT price
