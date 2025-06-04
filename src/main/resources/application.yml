@@ -24,6 +24,12 @@ spring:
       hibernate.timezone.default_storage: NORMALIZE_UTC
       hibernate.jdbc.time_zone: UTC
 
+## 생성된 bean 확인
+#logging:
+#  level:
+#    org.springframework.beans.factory.support: DEBUG
+#    org.springframework.data.jpa.repository.config: DEBUG
+
 ---
 spring.config.activate.on-profile: local, test
 
