@@ -1,6 +1,6 @@
-package kr.hhplus.be.server.concert.repository;
+package kr.hhplus.be.server.category.repository;
 
-import kr.hhplus.be.server.concert.entity.Category;
+import kr.hhplus.be.server.category.entity.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

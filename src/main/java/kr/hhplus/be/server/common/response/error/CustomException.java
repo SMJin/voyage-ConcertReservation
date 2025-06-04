@@ -1,17 +1,16 @@
 package kr.hhplus.be.server.common.response.error;
-import kr.hhplus.be.server.common.util.MessageUtil;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
 public class CustomException extends RuntimeException {
 
-    private final String messageCode;
     private final HttpStatus status;
+    private final String messageCode;
 
-    public CustomException(String messageCode, HttpStatus status) {
-        this.messageCode = messageCode;
+    public CustomException(HttpStatus status, String messageCode) {
         this.status = status;
+        this.messageCode = messageCode;
     }
 }
 

@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.concert.entity.key;
+package kr.hhplus.be.server.concert_category.entity.key;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
