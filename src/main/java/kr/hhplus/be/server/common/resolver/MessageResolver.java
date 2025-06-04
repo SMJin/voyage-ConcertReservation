@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.common.util;
+package kr.hhplus.be.server.common.resolver;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -8,16 +8,16 @@ import java.util.Locale;
 
 @Component
 @RequiredArgsConstructor
-public class MessageUtil {
+public class MessageResolver {
 
     private final MessageSource messageSource;
 
     public String get(String code) {
-        return messageSource.getMessage(code, null, Locale.getDefault());
+        return messageSource.getMessage(code, null, code, Locale.getDefault());
     }
 
     public String get(String code, Object... args) {
-        return messageSource.getMessage(code, args, Locale.getDefault());
+        return messageSource.getMessage(code, args, code, Locale.getDefault());
     }
 }
 

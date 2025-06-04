@@ -1,13 +1,15 @@
 package kr.hhplus.be.server.common.handler;
 
+import jakarta.persistence.EntityNotFoundException;
 import kr.hhplus.be.server.common.response.error.CustomException;
 import kr.hhplus.be.server.common.response.success.ApiResponse;
 import kr.hhplus.be.server.common.response.error.ValidationErrorResponse;
 import kr.hhplus.be.server.common.response.error.type.ErrorType;
 import kr.hhplus.be.server.common.response.error.ValidationErrorDetail;
-import kr.hhplus.be.server.common.util.MessageUtil;
+import kr.hhplus.be.server.common.resolver.MessageResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-    private final MessageUtil messageUtil;
+    private final MessageResolver messageResolver;
 
     /**
      * @Valid 유효성 검증 실패 처리
@@ -40,7 +42,7 @@ public class GlobalExceptionHandler {
                 .errors(errors)
                 .build();
 
-        String message = messageUtil.get("error.validation");
+        String message = messageResolver.get("response.error.validation");
         return ResponseEntity.badRequest().body(ApiResponse.fail(message, response));
     }
 
@@ -54,11 +56,22 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * EntityNotFoundException Id 조회했는데 객체가 없음
+     */
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ApiResponse<String>> handleEntityNotFoundException(EntityNotFoundException ex) {
+        log.warn("EntityNotFoundException 발생: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.fail(ex.getMessage()));
+    }
+
+    /**
      * CustomException 처리 (선택적 구현)
      */
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponse<String>> handleCustomException(CustomException ex) {
-        String message = messageUtil.get(ex.getMessageCode());
+        String message = messageResolver.get(ex.getMessageCode());
         log.warn("CustomException 발생: {}", message);
         return ResponseEntity.status(ex.getStatus())
                 .body(ApiResponse.fail(message));
