@@ -1,0 +1,8 @@
+response:
+  success:
+    default: 요청이 성공적으로 처리되었습니다.
+  error:
+    default: 오류가 발생했습니다.
+    validation: 요청 파라미터가 유효하지 않습니다.
+    duplicate: 이미 존재하는 값입니다.
+    internal: 서버 내부 오류가 발생했습니다.

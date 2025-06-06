@@ -3,6 +3,9 @@ spring:
     name: hhplus
   profiles:
     active: local
+  messages:
+    basename: messages
+    encoding: UTF-8
   datasource:
     name: HangHaePlusDataSource
     type: com.zaxxer.hikari.HikariDataSource
@@ -20,6 +23,12 @@ spring:
     properties:
       hibernate.timezone.default_storage: NORMALIZE_UTC
       hibernate.jdbc.time_zone: UTC
+
+## 생성된 bean 확인
+#logging:
+#  level:
+#    org.springframework.beans.factory.support: DEBUG
+#    org.springframework.data.jpa.repository.config: DEBUG
 
 ---
 spring.config.activate.on-profile: local, test

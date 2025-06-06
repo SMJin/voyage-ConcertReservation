@@ -22,7 +22,7 @@ erDiagram
 
     CONCERT {
         Long id PK
-        String title
+        String name
         DateTime start_time
         DateTime end_time
         String location
@@ -71,7 +71,7 @@ erDiagram
 
 #### CONCERT – 콘서트 정보
 - id: 콘서트 고유 ID
-- title: 콘서트 제목
+- name: 콘서트 제목
 - start_time / end_time: 공연 시작/종료 시간
 - location: 공연 장소
 
