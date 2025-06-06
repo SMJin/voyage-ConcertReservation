@@ -10,8 +10,6 @@
 flowchart TD
     User[사용자] --> UC1[콘서트 목록 조회]
     User --> UC2[콘서트 상세 조회]
-    Admin[관리자] --> UC1
-    Admin --> UC2
 ```
 
 ## 3. 시퀀스 다이어그램 (콘서트 상세 조회)
