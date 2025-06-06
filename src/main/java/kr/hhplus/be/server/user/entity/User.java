@@ -26,6 +26,8 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    private Long balance = 0L;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -34,5 +36,14 @@ public class User {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void addBalance(Long amount) {
+        this.balance += amount;
     }
 }
