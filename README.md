@@ -48,3 +48,6 @@ docker-compose up -d
 ## 🐝 단위 기능별 다이어그램 및 ERD
 > 시스템 설계 (상세)
 ### 🍯[콘서트 조회](docs/diagram-erd/read-consert.md)
+### 🍯[사용자 관리(JWT + Security)](docs/diagram-erd/jwt-security.md)
+### 🍯[포인트 충전](docs/diagram-erd/point-charge.md)
+### 🍯[콘서트 예약/결제](docs/diagram-erd/reserve-payment.md)
