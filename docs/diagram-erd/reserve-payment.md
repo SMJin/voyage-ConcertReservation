@@ -115,6 +115,10 @@ stateDiagram-v2
 | concert\_id | BIGINT     | 콘서트 ID (공연 정보)                    |
 | status      | VARCHAR    | 상태 (AVAILABLE, HELD, CONFIRMED 등) |
 | held\_at    | DATETIME   | 점유 시작 시간                          |
+> #### 좌석 상태 값 ENUM (ReservationStatus)
+> - AVAILABLE: 예약 가능
+> - HELD: 임시 점유중 (5분)
+> - CONFIRMED: 결제 완료로 확정된 좌석
 
 ### RESERVATION Table
 | 컬럼명          | 타입         | 설명                                   |
@@ -130,10 +134,13 @@ stateDiagram-v2
 > - RELEASED or CANCELLED: 실패 또는 만료
 
 ### PAYMENT Table
-| 컬럼명         | 타입     | 제약조건 | 설명      |
-|-------------|--------|------|---------|
-| concert_id  | BIGINT | FK   | 콘서트 ID  |
-| category_id | BIGINT | FK   | 카테고리 ID |
+| 컬럼명             | 타입         | 설명        |
+|-----------------|------------|-----------|
+| id              | BIGINT(PK) | 결제 ID     |
+| reservation\_id | BIGINT     | 연관된 예약 ID |
+| amount          | INT        | 결제 금액     |
+| success         | BOOLEAN    | 결제 성공 여부  |
+| paid\_at        | DATETIME   | 결제 일시     |
 
 ## 5. ERD
 ```mermaid
