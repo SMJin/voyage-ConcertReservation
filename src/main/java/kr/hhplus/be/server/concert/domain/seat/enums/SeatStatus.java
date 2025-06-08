@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.concert.domain.reservation.enums;
+package kr.hhplus.be.server.concert.domain.seat.enums;
 
 import jakarta.persistence.Embeddable;
 

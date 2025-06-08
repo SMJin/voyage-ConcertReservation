@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.concert.domain.reservation;
+package kr.hhplus.be.server.concert.domain.seat;
 
 import java.util.Optional;
 

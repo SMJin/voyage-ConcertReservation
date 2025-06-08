@@ -1,7 +1,5 @@
 package kr.hhplus.be.server.concert.domain.payment;
 
-import kr.hhplus.be.server.concert.domain.reservation.Seat;
-
 import java.util.Optional;
 
 public interface PaymentRepository {

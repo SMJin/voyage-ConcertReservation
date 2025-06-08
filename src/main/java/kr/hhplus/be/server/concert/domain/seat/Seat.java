@@ -1,11 +1,16 @@
-package kr.hhplus.be.server.concert.domain.reservation;
+package kr.hhplus.be.server.concert.domain.seat;
 
 import jakarta.persistence.*;
-import kr.hhplus.be.server.concert.domain.reservation.enums.SeatStatus;
+import kr.hhplus.be.server.concert.domain.seat.enums.SeatStatus;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Seat {
 
     @Id
@@ -18,5 +23,9 @@ public class Seat {
     private SeatStatus status;
 
     private LocalDateTime heldAt;
+
+    public void hold() {
+        this.status = SeatStatus.HELD;
+    }
 
 }
