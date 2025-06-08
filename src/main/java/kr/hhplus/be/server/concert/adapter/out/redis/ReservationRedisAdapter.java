@@ -20,6 +20,12 @@ public class ReservationRedisAdapter implements ReservationLockPort {
     }
 
     @Override
+    public Long getReservedUserId(Long seatId) {
+        String key = "seat:" + seatId;
+        return Long.parseLong(redisTemplate.opsForValue().get(key));
+    }
+
+    @Override
     public boolean isSeatLocked(Long seatId) {
         String key = "seat:" + seatId;
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
