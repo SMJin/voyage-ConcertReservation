@@ -31,8 +31,6 @@ public class ConcertService {
                 .filter(c -> cond.getDateFrom() == null || !c.getDate().toLocalDate().isBefore(cond.getDateFrom()))
                 .filter(c -> cond.getDateTo() == null || !c.getDate().toLocalDate().isAfter(cond.getDateTo()))
                 .filter(c -> cond.getVenue() == null || c.getVenue().contains(cond.getVenue()))
-                .filter(c -> cond.getPriceFrom() == -1 || c.getPrice() >= cond.getPriceFrom())
-                .filter(c -> cond.getPriceTo() == -1 || c.getPrice() <= cond.getPriceTo())
                 .collect(Collectors.toList());
     }
 }

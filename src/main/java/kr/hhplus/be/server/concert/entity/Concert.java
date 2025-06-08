@@ -22,7 +22,6 @@ public class Concert {
     private String name;
     private LocalDateTime date;
     private String venue;
-    private int price;
 
     @CreatedDate
     private LocalDateTime createdAt;

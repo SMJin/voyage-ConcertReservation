@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.concert.adapter.in.web;
 
-import kr.hhplus.be.server.concert.application.dto.PayForSeatRequest;
 import kr.hhplus.be.server.concert.application.dto.ReserveSeatRequest;
 import kr.hhplus.be.server.concert.application.port.in.PayForSeatUseCase;
 import kr.hhplus.be.server.concert.application.port.in.ReserveSeatUseCase;
@@ -26,11 +25,11 @@ public class ReservationController {
     }
 
     @PostMapping("/{reservationId}/pay")
-    public ResponseEntity<?> payForSeat(
-            @PathVariable Long reservationId,
-            @RequestBody PayForSeatRequest request
+    public ResponseEntity<?> payForSeat(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                        @PathVariable Long reservationId,
+                                        @RequestBody int amount
     ) {
-        payForSeatUseCase.pay(reservationId, request);
+        payForSeatUseCase.pay(userDetails.getUserId(), reservationId, amount);
         return ResponseEntity.ok().build();
     }
 }
