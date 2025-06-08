@@ -1,7 +1,7 @@
-package kr.hhplus.be.server.concert.adapter.seat.out.persistence;
+package kr.hhplus.be.server.concert.adapter.out.persistence.seat;
 
-import kr.hhplus.be.server.concert.domain.seat.Seat;
-import kr.hhplus.be.server.concert.domain.seat.SeatRepository;
+import kr.hhplus.be.server.concert.application.port.out.SeatPort;
+import kr.hhplus.be.server.concert.domain.Seat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -9,9 +9,9 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class JpaSeatRepository implements SeatRepository {
+public class SeatPersistenceAdapter implements SeatPort {
 
-    private final SpringDataSeatJpaRepository jpa; // ← Spring JPA interface
+    private final SeatJpaRepository jpa; // ← Spring JPA interface
 
     @Override
     public Optional<Seat> findById(Long id) {

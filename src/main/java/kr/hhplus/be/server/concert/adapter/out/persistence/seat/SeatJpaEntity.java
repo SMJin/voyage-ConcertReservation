@@ -1,7 +1,7 @@
-package kr.hhplus.be.server.concert.domain.seat;
+package kr.hhplus.be.server.concert.adapter.out.persistence.seat;
 
 import jakarta.persistence.*;
-import kr.hhplus.be.server.concert.domain.seat.enums.SeatStatus;
+import kr.hhplus.be.server.concert.domain.enums.SeatStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Seat {
+public class SeatJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,6 @@ public class Seat {
     private LocalDateTime heldAt;
 
     public void hold() {
-        this.status = SeatStatus.HELD;
+        this.status = SeatStatus.HOLD;
     }
-
 }

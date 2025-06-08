@@ -1,7 +1,7 @@
-package kr.hhplus.be.server.concert.adapter.reservation.out.persistence;
+package kr.hhplus.be.server.concert.adapter.out.persistence.reservation;
 
-import kr.hhplus.be.server.concert.domain.reservation.Reservation;
-import kr.hhplus.be.server.concert.domain.reservation.ReservationRepository;
+import kr.hhplus.be.server.concert.application.port.out.ReservationPort;
+import kr.hhplus.be.server.concert.domain.Reservation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -9,9 +9,9 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class JpaReservationRepository implements ReservationRepository {
+public class ReservationPersistenceAdapter implements ReservationPort {
 
-    private final SpringDataReservationJpaRepository jpa;
+    private final ReservationJpaRepository jpa;
 
     @Override
     public Optional<Reservation> findById(Long id) {

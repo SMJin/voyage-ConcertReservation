@@ -1,12 +1,17 @@
-package kr.hhplus.be.server.concert.domain.reservation;
+package kr.hhplus.be.server.concert.adapter.out.persistence.reservation;
 
 import jakarta.persistence.*;
-import kr.hhplus.be.server.concert.domain.reservation.enums.ReservationStatus;
+import kr.hhplus.be.server.concert.domain.enums.ReservationStatus;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-public class Reservation {
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+public class ReservationJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
