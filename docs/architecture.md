@@ -25,3 +25,46 @@
     ├── 📂 service
     └── 📂 repository
 ```
+
+### 예약/결제 시스템 Clean Architecture
+###### ☆★ Reservation 도메인 로직에 대해서
+```mermaid
+%%{init: {'theme': 'base'}}%%
+graph TD
+
+%%== Domain Layer ==%%
+subgraph Domain
+    Reservation[Reservation Entity]
+    ReservationStatus[ReservationStatus Enum]
+    ReservationRepositoryPort[<<interface>> ReservationRepositoryPort]
+end
+
+%%== Use Case Layer ==%%
+subgraph Application
+    ReserveSeatUseCase[ReserveSeatUseCase]
+end
+
+%%== Inbound Adapter ==%%
+subgraph Adapter-Inbound
+    ReservationController[ReservationController - REST API]
+end
+
+%%== Outbound Adapter ==%%
+subgraph Adapter-Outbound
+    ReservationJpaAdapter[ReservationJpaAdapter]
+end
+
+%%== Infrastructure (Bean 등록 등) ==%%
+subgraph Infrastructure
+    SpringConfig[SpringConfig\n@Configuration]
+end
+
+%%== 관계 설정 ==%%
+ReservationController --> ReserveSeatUseCase
+ReserveSeatUseCase --> ReservationRepositoryPort
+ReservationRepositoryPort -->|implements| ReservationJpaAdapter
+SpringConfig --> ReservationJpaAdapter
+
+ReserveSeatUseCase --> Reservation
+Reservation --> ReservationStatus
+```
