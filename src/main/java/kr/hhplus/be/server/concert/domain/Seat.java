@@ -11,6 +11,17 @@ public class Seat {
     private LocalDateTime heldAt;
     public void hold() {
         this.status = SeatStatus.HOLD;
+        this.heldAt = LocalDateTime.now();
+    }
+    public boolean isHeld() {
+        return this.status == SeatStatus.HOLD;
+    }
+    public void confirm() {
+        this.status = SeatStatus.CONFIRMED;
+    }
+    public void release() {
+        this.status = SeatStatus.AVAILABLE;
+        this.heldAt = null;
     }
 
 }

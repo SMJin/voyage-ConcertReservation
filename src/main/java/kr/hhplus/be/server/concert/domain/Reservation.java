@@ -1,9 +1,11 @@
 package kr.hhplus.be.server.concert.domain;
 
 import kr.hhplus.be.server.concert.domain.enums.ReservationStatus;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class Reservation {
     private Long id;
     private Long userId;
@@ -17,6 +19,10 @@ public class Reservation {
         this.seatId = seatId;
         this.status = ReservationStatus.HOLD;
         this.reservedAt = LocalDateTime.now();
+    }
+
+    public PaymentResult getAmount() {
+        return new PaymentResult(boolean success, String message);
     }
 
     public void confirm() {

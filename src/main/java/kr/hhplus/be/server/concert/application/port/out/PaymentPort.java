@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface PaymentPort {
     Optional<Payment> findById(Long id);
     void save(Payment payment);
+
 }
