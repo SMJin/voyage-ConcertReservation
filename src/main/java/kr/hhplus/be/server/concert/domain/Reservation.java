@@ -13,16 +13,11 @@ public class Reservation {
     private ReservationStatus status;
     private LocalDateTime reservedAt;
 
-    public Reservation(Long id, Long userId, Long seatId) {
-        this.id = id;
+    public Reservation(Long userId, Long seatId) {
         this.userId = userId;
         this.seatId = seatId;
         this.status = ReservationStatus.HOLD;
         this.reservedAt = LocalDateTime.now();
-    }
-
-    public PaymentResult getAmount() {
-        return new PaymentResult(boolean success, String message);
     }
 
     public void confirm() {
@@ -33,5 +28,9 @@ public class Reservation {
 
     public void cancel() {
         this.status = ReservationStatus.CANCELLED;
+    }
+
+    public boolean isPaid() {
+        return this.status == ReservationStatus.CONFIRMED;
     }
 }

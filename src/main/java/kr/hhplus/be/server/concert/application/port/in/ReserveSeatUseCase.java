@@ -1,8 +1,8 @@
 package kr.hhplus.be.server.concert.application.port.in;
 
-import kr.hhplus.be.server.concert.application.dto.ReserveSeatCommand;
+import kr.hhplus.be.server.concert.application.dto.ReserveSeatRequest;
 
 public interface ReserveSeatUseCase {
-    void reserve(ReserveSeatCommand command);
+    void reserve(Long userId, ReserveSeatRequest request);
 }
 

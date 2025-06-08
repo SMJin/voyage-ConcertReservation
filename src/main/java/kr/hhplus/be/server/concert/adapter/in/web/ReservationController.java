@@ -4,8 +4,10 @@ import kr.hhplus.be.server.concert.application.dto.PayForSeatRequest;
 import kr.hhplus.be.server.concert.application.dto.ReserveSeatRequest;
 import kr.hhplus.be.server.concert.application.port.in.PayForSeatUseCase;
 import kr.hhplus.be.server.concert.application.port.in.ReserveSeatUseCase;
+import kr.hhplus.be.server.user.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,8 +19,9 @@ public class ReservationController {
     private final PayForSeatUseCase payForSeatUseCase;
 
     @PostMapping
-    public ResponseEntity<?> reserveSeat(@RequestBody ReserveSeatRequest request) {
-        reserveSeatUseCase.reserve(request);
+    public ResponseEntity<?> reserveSeat(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                         @RequestBody ReserveSeatRequest request) {
+        reserveSeatUseCase.reserve(userDetails.getUserId(), request);
         return ResponseEntity.ok().build();
     }
 
