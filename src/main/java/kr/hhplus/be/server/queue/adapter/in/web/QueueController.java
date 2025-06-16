@@ -33,4 +33,10 @@ public class QueueController {
         queueService.removeToken(token);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/can-proceed")
+    public ResponseEntity<Boolean> canProceed(@RequestParam String token) {
+        boolean canProceed = queueService.canProceed(token);
+        return ResponseEntity.ok(canProceed);
+    }
 } 

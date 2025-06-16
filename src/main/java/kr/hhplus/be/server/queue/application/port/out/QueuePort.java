@@ -10,4 +10,7 @@ public interface QueuePort {
     Optional<QueueStatus> getStatus(String token);
     void removeToken(String token);
     boolean validateToken(String token);
+    Optional<QueueToken> getToken(String token);
+    boolean isFirstInQueue(String token);
+    void removeExpiredTokens();
 } 

@@ -5,11 +5,13 @@ import kr.hhplus.be.server.queue.domain.QueueStatus;
 import kr.hhplus.be.server.queue.domain.QueueToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -118,5 +120,65 @@ public class RedisQueueAdapter implements QueuePort {
         
         return "true".equals(active) && 
                LocalDateTime.parse(expiresAt).isAfter(LocalDateTime.now());
+    }
+
+    @Override
+    public Optional<QueueToken> getToken(String token) {
+        String tokenKey = TOKEN_KEY_PREFIX + token;
+        if (!redisTemplate.hasKey(tokenKey)) {
+            return Optional.empty();
+        }
+
+        String userId = (String) redisTemplate.opsForHash().get(tokenKey, "userId");
+        String issuedAt = (String) redisTemplate.opsForHash().get(tokenKey, "issuedAt");
+        String expiresAt = (String) redisTemplate.opsForHash().get(tokenKey, "expiresAt");
+        String active = (String) redisTemplate.opsForHash().get(tokenKey, "active");
+
+        if (userId == null || issuedAt == null || expiresAt == null || active == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(QueueToken.builder()
+                .token(token)
+                .userId(Long.parseLong(userId))
+                .issuedAt(LocalDateTime.parse(issuedAt))
+                .expiresAt(LocalDateTime.parse(expiresAt))
+                .active(Boolean.parseBoolean(active))
+                .build());
+    }
+
+    @Override
+    public boolean isFirstInQueue(String token) {
+        String tokenKey = TOKEN_KEY_PREFIX + token;
+        if (!redisTemplate.hasKey(tokenKey)) {
+            return false;
+        }
+
+        String userId = (String) redisTemplate.opsForHash().get(tokenKey, "userId");
+        if (userId == null) {
+            return false;
+        }
+
+        Long position = redisTemplate.opsForZSet().rank(QUEUE_KEY, userId);
+        return position != null && position == 0; // 0이면 첫 번째
+    }
+
+    @Override
+    @Scheduled(fixedRate = 60000) // 1분마다 실행
+    public void removeExpiredTokens() {
+        Set<String> tokens = redisTemplate.keys(TOKEN_KEY_PREFIX + "*");
+        if (tokens == null) return;
+
+        LocalDateTime now = LocalDateTime.now();
+        for (String tokenKey : tokens) {
+            String expiresAt = (String) redisTemplate.opsForHash().get(tokenKey, "expiresAt");
+            if (expiresAt != null && LocalDateTime.parse(expiresAt).isBefore(now)) {
+                String userId = (String) redisTemplate.opsForHash().get(tokenKey, "userId");
+                if (userId != null) {
+                    redisTemplate.opsForZSet().remove(QUEUE_KEY, userId);
+                }
+                redisTemplate.delete(tokenKey);
+            }
+        }
     }
 } 
