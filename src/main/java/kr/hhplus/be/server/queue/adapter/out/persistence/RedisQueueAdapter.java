@@ -35,7 +35,8 @@ public class RedisQueueAdapter implements QueuePort {
         redisTemplate.opsForZSet().add(
                 QUEUE_KEY,                          // 1. 대기열 키: "concert:queue"
                 userId.toString(),                  // 2. 값: 유저 ID (String 형태로 저장)
-                now.toEpochSecond(ZoneOffset.UTC)   // 3. 정렬 기준(score): 현재 시간 (초 단위)
+                now.toEpochSecond(ZoneOffset.UTC) * 1_000_000_000L
+                + now.getNano()                   // 3. 정렬 기준(score): 현재 시간 (초 단위)
         );
 
         // 토큰 정보 저장
