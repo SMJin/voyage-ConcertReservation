@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.queue.adapter.out.persistence;
 
+import kr.hhplus.be.server.common.aop.annotation.DistributedLock;
 import kr.hhplus.be.server.queue.application.port.out.QueuePort;
 import kr.hhplus.be.server.queue.domain.QueueStatus;
 import kr.hhplus.be.server.queue.domain.QueueToken;
@@ -172,22 +173,20 @@ public class RedisQueueAdapter implements QueuePort {
     }
 
     @Override
+    @DistributedLock(key = "queue:lock")
     public boolean isFirstInQueue(String token) {
         String tokenKey = TOKEN_KEY_PREFIX + token;
-        if (!redisTemplate.hasKey(tokenKey)) {
-            return false;
-        }
+        if (!redisTemplate.hasKey(tokenKey)) return false;
 
         String userId = (String) redisTemplate.opsForHash().get(tokenKey, "userId");
-        if (userId == null) {
-            return false;
-        }
+        if (userId == null) return false;
 
         Long position = redisTemplate.opsForZSet().rank(QUEUE_KEY, userId);
         return position != null && position == 0; // 0이면 첫 번째
     }
 
     @Override
+    @DistributedLock(key = "#seatId", waitTime = 3, leaseTime = 10)
     @Scheduled(fixedRate = 60000) // 1분마다 실행
     public void removeExpiredTokens() {
         Set<String> tokens = redisTemplate.keys(TOKEN_KEY_PREFIX + "*");
