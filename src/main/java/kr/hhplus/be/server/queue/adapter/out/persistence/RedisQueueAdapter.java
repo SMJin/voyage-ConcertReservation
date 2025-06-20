@@ -10,6 +10,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -30,6 +31,7 @@ public class RedisQueueAdapter implements QueuePort {
     private final RedissonClient redissonClient; // Redisson 클라이언트 사용 (필요시)
 
     @Override
+    @DistributedLock(key = "lock:concert:queue:issueToken-user:#userId", waitTime = 5, leaseTime = 3)
     public QueueToken issueToken(Long userId) {
         String token = UUID.randomUUID().toString();
         LocalDateTime now = LocalDateTime.now();
@@ -37,45 +39,29 @@ public class RedisQueueAdapter implements QueuePort {
 
         int position = 0; // 대기열 순서 초기화
 
-        RLock lock = redissonClient.getLock("lock:concert:queue:issueToken-user:" + userId);
+        // Redis 의 Sorted Set(정렬된 집합) 자료구조에 지금까지 들어온 사용자를 대기열에 추가 (score는 현재 시간의 타임스탬프)
+        redisTemplate.opsForZSet().add(
+                QUEUE_KEY,                          // 1. 대기열 키: "concert:queue"
+                userId.toString(),                  // 2. 값: 유저 ID (String 형태로 저장)
+                now.toEpochSecond(ZoneOffset.UTC) * 1_000_000_000L
+                        + now.getNano()                   // 3. 정렬 기준(score): 현재 시간 (초 단위)
+        );
 
-        try {
-            if (lock.tryLock(5, 3, TimeUnit.SECONDS)) { // 5초 동안 락을 시도하고, 성공하면 3초 동안 유지
-                // Redis 의 Sorted Set(정렬된 집합) 자료구조에 지금까지 들어온 사용자를 대기열에 추가 (score는 현재 시간의 타임스탬프)
-                redisTemplate.opsForZSet().add(
-                        QUEUE_KEY,                          // 1. 대기열 키: "concert:queue"
-                        userId.toString(),                  // 2. 값: 유저 ID (String 형태로 저장)
-                        now.toEpochSecond(ZoneOffset.UTC) * 1_000_000_000L
-                                + now.getNano()                   // 3. 정렬 기준(score): 현재 시간 (초 단위)
-                );
+        // 토큰 정보 저장
+        String tokenKey = TOKEN_KEY_PREFIX + token;
+        redisTemplate.opsForHash().put(tokenKey, "userId", userId.toString());
+        redisTemplate.opsForHash().put(tokenKey, "issuedAt", now.toString());
+        redisTemplate.opsForHash().put(tokenKey, "expiresAt", expiresAt.toString());
+        redisTemplate.opsForHash().put(tokenKey, "active", "true"); // 활성 상태 표시 (토큰이 유효함을 나타냄)
+        redisTemplate.expire(tokenKey, TOKEN_EXPIRY_MINUTES, TimeUnit.MINUTES);
 
-                // 토큰 정보 저장
-                String tokenKey = TOKEN_KEY_PREFIX + token;
-                redisTemplate.opsForHash().put(tokenKey, "userId", userId.toString());
-                redisTemplate.opsForHash().put(tokenKey, "issuedAt", now.toString());
-                redisTemplate.opsForHash().put(tokenKey, "expiresAt", expiresAt.toString());
-                redisTemplate.opsForHash().put(tokenKey, "active", "true"); // 활성 상태 표시 (토큰이 유효함을 나타냄)
-                redisTemplate.expire(tokenKey, TOKEN_EXPIRY_MINUTES, TimeUnit.MINUTES);
-
-                Long rank = redisTemplate.opsForZSet()  // Redis의 Sorted Set(ZSET) 기능에 접근
-                        .rank(QUEUE_KEY, userId.toString());    // 해당 유저가 몇 번째인지 0부터 시작하는 순위를 가져옴
-                if (rank == null) { // 유저가 대기열에 추가되지 않은 경우 (방어 코드)
-                    throw new IllegalStateException("User not found in queue after adding");
-                }
-                // 현재 대기 순서 계산
-                position = rank.intValue() + 1; // 순위는 0부터 시작하므로 +1을 해서 1부터 시작하는 Long 타입 순위로 변환
-
-            } else {
-                throw new IllegalStateException("Could not acquire lock for issuing token");
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // 현재 스레드의 인터럽트 상태를 복원 // 락 획득 중 인터럽트가 발생한 경우
-            throw new RuntimeException("Lock acquisition was interrupted", e);
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock(); // 락 해제
-            }
+        Long rank = redisTemplate.opsForZSet()  // Redis의 Sorted Set(ZSET) 기능에 접근
+                .rank(QUEUE_KEY, userId.toString());    // 해당 유저가 몇 번째인지 0부터 시작하는 순위를 가져옴
+        if (rank == null) { // 유저가 대기열에 추가되지 않은 경우 (방어 코드)
+            throw new IllegalStateException("User not found in queue after adding");
         }
+        // 현재 대기 순서 계산
+        position = rank.intValue() + 1; // 순위는 0부터 시작하므로 +1을 해서 1부터 시작하는 Long 타입 순위로 변환
 
         return QueueToken.builder()
                 .token(token)
