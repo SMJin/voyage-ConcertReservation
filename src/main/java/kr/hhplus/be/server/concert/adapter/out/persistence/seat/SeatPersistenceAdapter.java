@@ -13,21 +13,22 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SeatPersistenceAdapter implements SeatPort {
 
-    private final SeatJpaRepository jpa; // ← Spring JPA interface
+    private final SeatJpaRepository jpa;
 
     @Override
     public Optional<Seat> findById(Long id) {
-        return jpa.findById(id);
+        return jpa.findById(id)
+                .map(this::toDomain);
     }
 
     @Override
     public void save(Seat seat) {
-        jpa.save(seat);
+        jpa.save(toJpaEntity(seat));
     }
 
     @Override
     public void assignToUser(Long seatId, Long userId) {
-        Seat seat = jpa.findById(seatId)
+        SeatJpaEntity seat = jpa.findById(seatId)
                 .orElseThrow(() -> new CustomException(HttpStatus.CONFLICT, "좌석 정보가 존재하지 않습니다."));
         seat.assignToUser(userId);
         jpa.save(seat);
@@ -35,11 +36,23 @@ public class SeatPersistenceAdapter implements SeatPort {
 
     @Override
     public void release(Long seatId) {
-        Seat seat = jpa.findById(seatId)
+        SeatJpaEntity seat = jpa.findById(seatId)
                 .orElseThrow(() -> new CustomException(HttpStatus.CONFLICT, "좌석 정보가 존재하지 않습니다."));
         seat.release();
         jpa.save(seat);
     }
 
+    private Seat toDomain(SeatJpaEntity entity) {
+        return new Seat(entity.getConcertId(), 0); // TODO: Add price field to SeatJpaEntity
+    }
+
+    private SeatJpaEntity toJpaEntity(Seat domain) {
+        return SeatJpaEntity.builder()
+                .id(domain.getId())
+                .concertId(domain.getConcertId())
+                .status(domain.getStatus())
+                .heldAt(domain.getHeldAt())
+                .build();
+    }
 }
 

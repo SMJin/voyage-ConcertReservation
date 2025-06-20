@@ -17,21 +17,39 @@ public class PaymentPersistenceAdapter implements PaymentPort {
 
     @Override
     public Optional<Payment> findById(Long id) {
-        return jpa.findById(id);
+        return jpa.findById(id).map(this::toDomain);
     }
 
     @Override
     public void save(Payment payment) {
-        jpa.save(payment);
+        jpa.save(toJpaEntity(payment));
     }
 
-    /**
-     * 실제 결제 로직 대신 성공 시나리오 가정
-     * (실제로는 외부 API 연동해서 호출 - TossPayments, KakaoPay 등)
-     */
     @Override
     public PaymentResult pay(Long reservationId, int amount) {
+        // 실제 결제 로직은 외부 결제 시스템과 연동되어야 합니다.
+        // 여기서는 간단히 성공으로 가정합니다.
         String transactionId = UUID.randomUUID().toString();
         return PaymentResult.success(transactionId);
+    }
+
+    private PaymentJpaEntity toJpaEntity(Payment payment) {
+        return PaymentJpaEntity.builder()
+                .id(payment.getId())
+                .reservationId(payment.getReservationId())
+                .amount(payment.getAmount())
+                .success(payment.isSuccess())
+                .paidAt(payment.getPaidAt())
+                .build();
+    }
+
+    private Payment toDomain(PaymentJpaEntity entity) {
+        return Payment.builder()
+                .id(entity.getId())
+                .reservationId(entity.getReservationId())
+                .amount(entity.getAmount())
+                .success(entity.isSuccess())
+                .paidAt(entity.getPaidAt())
+                .build();
     }
 }

@@ -34,6 +34,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis") // redis
+	implementation("org.redisson:redisson-spring-boot-starter:3.23.4") // Redisson (Redis 기반 분산 락)
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-security") // spring security
 
@@ -59,6 +60,7 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testCompileOnly("org.projectlombok:lombok")
 	testAnnotationProcessor("org.projectlombok:lombok")
+	testImplementation("it.ozimov:embedded-redis:0.7.2") // Embedded Redis for testing
 }
 
 tasks.withType<Test> {
