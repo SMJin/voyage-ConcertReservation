@@ -60,6 +60,7 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testCompileOnly("org.projectlombok:lombok")
 	testAnnotationProcessor("org.projectlombok:lombok")
+	testImplementation("it.ozimov:embedded-redis:0.7.2") // Embedded Redis for testing
 }
 
 tasks.withType<Test> {

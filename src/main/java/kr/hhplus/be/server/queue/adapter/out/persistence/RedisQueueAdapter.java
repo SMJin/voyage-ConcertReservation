@@ -168,7 +168,7 @@ public class RedisQueueAdapter implements QueuePort {
     }
 
     @Override
-    @DistributedLock(key = "#seatId", waitTime = 3, leaseTime = 10)
+    @DistributedLock(key = "queue:lock:removeExpiredTokens")
     @Scheduled(fixedRate = 60000) // 1분마다 실행
     public void removeExpiredTokens() {
         Set<String> tokens = redisTemplate.keys(TOKEN_KEY_PREFIX + "*");
