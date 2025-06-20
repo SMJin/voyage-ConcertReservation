@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.concert.application.service;
 
+import kr.hhplus.be.server.common.aop.annotation.DistributedLock;
 import kr.hhplus.be.server.common.response.error.CustomException;
 import kr.hhplus.be.server.concert.application.dto.ReserveSeatRequest;
 import kr.hhplus.be.server.concert.application.port.in.ReserveSeatUseCase;
@@ -11,6 +12,9 @@ import kr.hhplus.be.server.concert.application.port.out.SeatPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 
@@ -23,6 +27,8 @@ public class ReserveSeatService implements ReserveSeatUseCase {
     private final ReservationLockPort reservationLockPort;
 
     @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @DistributedLock(key = "lock:concert:reserveSeat-user:#userId-seat:#request.seatId", waitTime = 5, leaseTime = 3)
     public void reserve(Long userId, ReserveSeatRequest request) {
         // 1. 예약 가능한 상태인지 검증
         if (reservationLockPort.isSeatLocked(request.getSeatId())) {

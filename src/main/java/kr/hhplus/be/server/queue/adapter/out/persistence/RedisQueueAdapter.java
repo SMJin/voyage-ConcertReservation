@@ -5,12 +5,9 @@ import kr.hhplus.be.server.queue.application.port.out.QueuePort;
 import kr.hhplus.be.server.queue.domain.QueueStatus;
 import kr.hhplus.be.server.queue.domain.QueueToken;
 import lombok.RequiredArgsConstructor;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -28,7 +25,6 @@ public class RedisQueueAdapter implements QueuePort {
     private static final int ESTIMATED_PROCESSING_TIME_PER_USER = 5; // 초 단위
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final RedissonClient redissonClient; // Redisson 클라이언트 사용 (필요시)
 
     @Override
     @DistributedLock(key = "lock:concert:queue:issueToken-user:#userId", waitTime = 5, leaseTime = 3)
