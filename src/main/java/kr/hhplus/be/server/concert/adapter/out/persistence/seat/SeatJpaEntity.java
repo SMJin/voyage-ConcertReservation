@@ -26,5 +26,19 @@ public class SeatJpaEntity {
 
     public void hold() {
         this.status = SeatStatus.HOLD;
+        this.heldAt = LocalDateTime.now();
+    }
+
+    public void confirm() {
+        this.status = SeatStatus.CONFIRMED;
+    }
+
+    public void release() {
+        this.status = SeatStatus.AVAILABLE;
+        this.heldAt = null;
+    }
+
+    public void assignToUser(Long userId) {
+        // TODO: Add userId field to SeatJpaEntity
     }
 }
