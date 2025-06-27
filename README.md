@@ -51,3 +51,7 @@ docker-compose up -d
 ### 🍯[사용자 관리(JWT + Security)](docs/diagram-erd/jwt-security.md)
 ### 🍯[포인트 충전](docs/diagram-erd/point-charge.md)
 ### 🍯[콘서트 예약/결제](docs/diagram-erd/reserve-payment.md)
+
+## 🦢 대용량 트래픽 & 데이터처리
+### 🦆 [콘서트 예약 서비스의 분산 환경에 존재하는 동시성 문제 분석](docs/concurrency-issue.md)
+
