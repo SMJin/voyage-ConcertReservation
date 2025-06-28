@@ -1,9 +1,12 @@
 package kr.hhplus.be.server.concert.adapter.out.persistence.seat;
 
+import jakarta.persistence.LockModeType;
 import kr.hhplus.be.server.common.response.error.CustomException;
 import kr.hhplus.be.server.concert.application.port.out.SeatPort;
+import kr.hhplus.be.server.concert.domain.Reservation;
 import kr.hhplus.be.server.concert.domain.Seat;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +20,16 @@ public class SeatPersistenceAdapter implements SeatPort {
 
     @Override
     public Optional<Seat> findById(Long id) {
+        return jpa.findById(id)
+                .map(this::toDomain);
+    }
+
+    /**
+     * 예약 및 수정용 비관적 락
+     */
+    @Override
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public Optional<Seat> findWithLockById(Long id) {
         return jpa.findById(id)
                 .map(this::toDomain);
     }
