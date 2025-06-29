@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.common.config;
+package kr.hhplus.be.server.config.security;
 
 import kr.hhplus.be.server.common.security.CustomAuthenticationEntryPoint;
 import kr.hhplus.be.server.common.filter.JwtAuthenticationFilter;

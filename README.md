@@ -57,5 +57,8 @@ docker-compose up -d
 ### 🦆 [낙관적 락, 비관적 락 적용기준](docs/massive-traffic-data-manufacture/2-optimistic-pessimistic-lock.md)
 ### 🦆 [Redis의 분산락](docs/massive-traffic-data-manufacture/3-redis-distributed-lock.md)
 
+## 💰 캐시 계층 & 캐시 일관성 전략
+### 💸 [메모리 캐시](docs/massive-traffic-data-manufacture/4-memory-cache.md)
+
 ## 🐞 에러 핸들링
 ### 🐛 [SpEL 구문 오류 (EL1041E)](docs/error/fix-0_4/1-SpEL%20구문%20오류%20(EL1041E).md)

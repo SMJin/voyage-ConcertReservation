@@ -33,6 +33,8 @@ dependencies {
     // Spring
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("com.github.ben-manes.caffeine:caffeine") // Caffeine Cache
+	implementation("org.springframework.boot:spring-boot-starter-cache") // Spring Cache
 	implementation("org.springframework.boot:spring-boot-starter-data-redis") // redis
 	implementation("org.redisson:redisson-spring-boot-starter:3.23.4") // Redisson (Redis 기반 분산 락)
 	implementation("org.springframework.boot:spring-boot-starter-web")
