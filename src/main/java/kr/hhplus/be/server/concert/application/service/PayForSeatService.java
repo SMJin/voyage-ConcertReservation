@@ -37,7 +37,7 @@ public class PayForSeatService implements PayForSeatUseCase {
      */
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    @DistributedLock(key = "lock:concert:payForSeat-user:#userId-reservation:#reservationId", waitTime = 5, leaseTime = 3)
+    @DistributedLock(key = "'lock:concert:payForSeat-user:#userId-reservation:#reservationId'", waitTime = 5, leaseTime = 3)
     public void pay(Long userId, Long reservationId, int amount) {
         
         // 1단계: 예약정보 조회 (비관적 락 적용)

@@ -27,7 +27,7 @@ public class RedisQueueAdapter implements QueuePort {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    @DistributedLock(key = "lock:concert:queue:issueToken-user:#userId", waitTime = 5, leaseTime = 3)
+    @DistributedLock(key = "'lock:concert:queue:issueToken-user:#userId'", waitTime = 5, leaseTime = 3)
     public QueueToken issueToken(Long userId) {
         String token = UUID.randomUUID().toString();
         LocalDateTime now = LocalDateTime.now();
@@ -155,7 +155,7 @@ public class RedisQueueAdapter implements QueuePort {
     }
 
     @Override
-    @DistributedLock(key = "queue:lock")
+    @DistributedLock(key = "'queue:lock'")
     public boolean isFirstInQueue(String token) {
         String tokenKey = TOKEN_KEY_PREFIX + token;
         if (!redisTemplate.hasKey(tokenKey)) return false;
@@ -168,7 +168,7 @@ public class RedisQueueAdapter implements QueuePort {
     }
 
     @Override
-    @DistributedLock(key = "queue:lock:removeExpiredTokens")
+    @DistributedLock(key = "'queue:lock:removeExpiredTokens'")
     @Scheduled(fixedRate = 60000) // 1분마다 실행
     public void removeExpiredTokens() {
         Set<String> tokens = redisTemplate.keys(TOKEN_KEY_PREFIX + "*");
