@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.concert_category.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import kr.hhplus.be.server.concert.service.ConcertService;
 import kr.hhplus.be.server.concert_category.dto.ConcertWithCategoryResponse;
 import kr.hhplus.be.server.category.entity.Category;
@@ -9,6 +9,7 @@ import kr.hhplus.be.server.concert_category.dto.ConcertWithCategorySearchCond;
 import kr.hhplus.be.server.concert_category.repository.ConcertCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class ConcertCategoryService {
 
@@ -24,7 +24,8 @@ public class ConcertCategoryService {
 
     private final ConcertCategoryRepository concertCategoryRepository;
 
-    @Transactional
+    @Cacheable(value = "concertWithCategories", key = "#concertId")
+    @Transactional(readOnly = true)
     public ConcertWithCategoryResponse getConcertWithCategories(Long concertId) {
         Concert concert = concertService.getOrThrow(concertId);
 
@@ -45,7 +46,7 @@ public class ConcertCategoryService {
                 .updatedAt(concert.getUpdatedAt())
                 .build();
     }
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ConcertWithCategoryResponse> search(ConcertWithCategorySearchCond cond) {
         List<Concert> searchedConcerts = concertService.search(cond);
         List<ConcertWithCategoryResponse> responses = new ArrayList<>();
