@@ -7,10 +7,14 @@ import kr.hhplus.be.server.queue.application.service.QueueService;
 import kr.hhplus.be.server.user.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -21,6 +25,7 @@ public class ReservationController {
     private final ReserveSeatUseCase reserveSeatUseCase;
     private final PayForSeatUseCase payForSeatUseCase;
     private final QueueService queueService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @PostMapping
     public ResponseEntity<?> reserveSeat(@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -46,5 +51,13 @@ public class ReservationController {
                                       @RequestBody int amount) {
         payForSeatUseCase.pay(userDetails.getUserId(), reservationId, amount);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/ranking/soldout")
+    public ResponseEntity<?> getSoldoutRanking() {
+        // Redis에서 매진 순서대로 콘서트 ID 반환
+        Set<Object> concertIds = redisTemplate.opsForZSet().range("concert:soldout:ranking", 0, -1);
+        List<Long> ranking = concertIds.stream().map(id -> (Long) id).toList();
+        return ResponseEntity.ok(ranking);
     }
 }

@@ -11,6 +11,7 @@ import kr.hhplus.be.server.concert.domain.Seat;
 import kr.hhplus.be.server.user.entity.User;
 import kr.hhplus.be.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -25,6 +26,7 @@ public class PayForSeatService implements PayForSeatUseCase {
     private final ReservationLockPort reservationLockPort;
     private final SeatPort seatPort;
     private final UserRepository userRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 좌석 결제 서비스
@@ -106,5 +108,13 @@ public class PayForSeatService implements PayForSeatUseCase {
         //   Reservation 엔티티의 @Version 필드로 동시성 제어
         //   충돌 시 OptimisticLockException 발생
         reservationPort.save(reservation);
+
+        // --- 매진 감지 및 Redis 기록 추가 ---
+        Long concertId = seat.getConcertId();
+        boolean isSoldOut = seatPort.isConcertSoldOut(concertId);
+        if (isSoldOut) {
+            long soldoutTime = System.currentTimeMillis();
+            redisTemplate.opsForZSet().add("concert:soldout:ranking", concertId, soldoutTime);
+        }
     }
 }
