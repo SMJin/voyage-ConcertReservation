@@ -21,14 +21,37 @@ import java.util.concurrent.TimeUnit;
 public class RedisQueueAdapter implements QueuePort {
     private static final String QUEUE_KEY = "concert:queue";
     private static final String TOKEN_KEY_PREFIX = "concert:token:";
+    private static final String USER_TOKEN_KEY = "concert:user:token:"; // 유저별 토큰 매핑
     private static final int TOKEN_EXPIRY_MINUTES = 30;
     private static final int ESTIMATED_PROCESSING_TIME_PER_USER = 5; // 초 단위
 
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    @DistributedLock(key = "lock:concert:queue:issueToken-user:#userId", waitTime = 5, leaseTime = 3)
+    @DistributedLock(key = "'lock:concert:queue:issueToken-user:' + #userId", waitTime = 5, leaseTime = 3)
     public QueueToken issueToken(Long userId) {
+        // 이미 토큰이 발급되었는지 확인
+        String existingToken = redisTemplate.opsForValue().get(USER_TOKEN_KEY + userId);
+        if (existingToken != null && validateToken(existingToken)) {
+            // 기존 토큰이 유효하면 해당 토큰 반환
+            Optional<QueueToken> existingQueueToken = getToken(existingToken);
+            if (existingQueueToken.isPresent()) {
+                QueueToken token = existingQueueToken.get();
+                // 현재 대기열 순서 확인
+                Long rank = redisTemplate.opsForZSet().rank(QUEUE_KEY, userId.toString());
+                int position = (rank != null) ? rank.intValue() + 1 : 1;
+                
+                return QueueToken.builder()
+                        .token(token.getToken())
+                        .userId(userId)
+                        .position(position)
+                        .issuedAt(token.getIssuedAt())
+                        .expiresAt(token.getExpiresAt())
+                        .active(true)
+                        .build();
+            }
+        }
+
         String token = UUID.randomUUID().toString();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiresAt = now.plusMinutes(TOKEN_EXPIRY_MINUTES);
@@ -36,6 +59,7 @@ public class RedisQueueAdapter implements QueuePort {
         int position = 0; // 대기열 순서 초기화
 
         // Redis 의 Sorted Set(정렬된 집합) 자료구조에 지금까지 들어온 사용자를 대기열에 추가 (score는 현재 시간의 타임스탬프)
+        // ZSET은 자동으로 정렬되므로, 시간 순서대로 대기열이 유지됨
         redisTemplate.opsForZSet().add(
                 QUEUE_KEY,                          // 1. 대기열 키: "concert:queue"
                 userId.toString(),                  // 2. 값: 유저 ID (String 형태로 저장)
@@ -43,13 +67,16 @@ public class RedisQueueAdapter implements QueuePort {
                         + now.getNano()                   // 3. 정렬 기준(score): 현재 시간 (초 단위)
         );
 
-        // 토큰 정보 저장
+        // Redis의 Hash 자료구조를 사용하여 토큰 정보를 저장
         String tokenKey = TOKEN_KEY_PREFIX + token;
         redisTemplate.opsForHash().put(tokenKey, "userId", userId.toString());
         redisTemplate.opsForHash().put(tokenKey, "issuedAt", now.toString());
         redisTemplate.opsForHash().put(tokenKey, "expiresAt", expiresAt.toString());
         redisTemplate.opsForHash().put(tokenKey, "active", "true"); // 활성 상태 표시 (토큰이 유효함을 나타냄)
         redisTemplate.expire(tokenKey, TOKEN_EXPIRY_MINUTES, TimeUnit.MINUTES);
+
+        // 유저별 토큰 매핑 저장
+        redisTemplate.opsForValue().set(USER_TOKEN_KEY + userId, token, TOKEN_EXPIRY_MINUTES, TimeUnit.MINUTES);
 
         Long rank = redisTemplate.opsForZSet()  // Redis의 Sorted Set(ZSET) 기능에 접근
                 .rank(QUEUE_KEY, userId.toString());    // 해당 유저가 몇 번째인지 0부터 시작하는 순위를 가져옴
@@ -111,6 +138,8 @@ public class RedisQueueAdapter implements QueuePort {
         String userId = (String) redisTemplate.opsForHash().get(tokenKey, "userId");
         if (userId != null) {
             redisTemplate.opsForZSet().remove(QUEUE_KEY, userId);
+            // 유저별 토큰 매핑도 삭제
+            redisTemplate.delete(USER_TOKEN_KEY + userId);
         }
         redisTemplate.delete(tokenKey);
     }
@@ -155,7 +184,7 @@ public class RedisQueueAdapter implements QueuePort {
     }
 
     @Override
-    @DistributedLock(key = "queue:lock")
+    @DistributedLock(key = "'queue:lock'")
     public boolean isFirstInQueue(String token) {
         String tokenKey = TOKEN_KEY_PREFIX + token;
         if (!redisTemplate.hasKey(tokenKey)) return false;
@@ -168,7 +197,7 @@ public class RedisQueueAdapter implements QueuePort {
     }
 
     @Override
-    @DistributedLock(key = "queue:lock:removeExpiredTokens")
+    @DistributedLock(key = "'queue:lock:removeExpiredTokens'")
     @Scheduled(fixedRate = 60000) // 1분마다 실행
     public void removeExpiredTokens() {
         Set<String> tokens = redisTemplate.keys(TOKEN_KEY_PREFIX + "*");
@@ -181,6 +210,8 @@ public class RedisQueueAdapter implements QueuePort {
                 String userId = (String) redisTemplate.opsForHash().get(tokenKey, "userId");
                 if (userId != null) {
                     redisTemplate.opsForZSet().remove(QUEUE_KEY, userId);
+                    // 유저별 토큰 매핑도 삭제
+                    redisTemplate.delete(USER_TOKEN_KEY + userId);
                 }
                 redisTemplate.delete(tokenKey);
             }

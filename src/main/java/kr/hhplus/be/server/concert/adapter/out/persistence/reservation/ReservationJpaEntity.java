@@ -13,6 +13,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ReservationJpaEntity {
 
+    // 낙관적 락을 위한 버전 필드
+    @Version
+    private Long version;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

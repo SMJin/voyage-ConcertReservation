@@ -65,12 +65,22 @@ public class JwtTokenProvider {
     }
 
     public String getUsernameFromToken(String token) {
+        return getClaims(token)
+                .getSubject();
+    }
+
+    public String getTokenValidity(String token) {
+        return getClaims(token)
+                .getExpiration()
+                .toString();
+    }
+
+    private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 
     public boolean validateToken(String token) {

@@ -63,6 +63,6 @@ public class DistributedLockAspect {
         }
 
         ExpressionParser parser = new SpelExpressionParser();
-        return "lock:" + parser.parseExpression(keyExpression).getValue(context, String.class);
+        return parser.parseExpression(keyExpression).getValue(context, String.class);
     }
 }
