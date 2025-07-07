@@ -56,7 +56,9 @@ public class ReservationController {
     @GetMapping("/ranking/soldout")
     public ResponseEntity<?> getSoldoutRanking() {
         // Redis에서 매진 순서대로 콘서트 ID 반환
-        Set<Object> concertIds = redisTemplate.opsForZSet().range("concert:soldout:ranking", 0, -1);
+        @Value("${app.redis.key.soldout-ranking}")
+        private String soldoutRankingKey;
+        Set<Object> concertIds = redisTemplate.opsForZSet().range(soldoutRankingKey, 0, -1);
         List<Long> ranking = concertIds.stream().map(id -> (Long) id).toList();
         return ResponseEntity.ok(ApiResponse.ok(ranking));
     }
