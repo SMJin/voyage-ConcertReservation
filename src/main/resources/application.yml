@@ -32,7 +32,10 @@ spring:
 #  level:
 #    org.springframework.beans.factory.support: DEBUG
 #    org.springframework.data.jpa.repository.config: DEBUG
-
+app:
+  redis:
+    key:
+      soldout-ranking: concert:soldout:ranking
 ---
 spring.config.activate.on-profile: local, test
 
