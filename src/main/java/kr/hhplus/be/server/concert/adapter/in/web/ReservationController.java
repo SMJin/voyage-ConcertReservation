@@ -58,6 +58,6 @@ public class ReservationController {
         // Redis에서 매진 순서대로 콘서트 ID 반환
         Set<Object> concertIds = redisTemplate.opsForZSet().range("concert:soldout:ranking", 0, -1);
         List<Long> ranking = concertIds.stream().map(id -> (Long) id).toList();
-        return ResponseEntity.ok(ranking);
+        return ResponseEntity.ok(ApiResponse.ok(ranking));
     }
 }
