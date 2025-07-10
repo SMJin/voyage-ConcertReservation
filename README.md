@@ -64,6 +64,7 @@ docker-compose up -d
 
 ## 📰 Event-Driven Architecture
 ### 🗞️ [Event-Driven Architecture](docs/event-driven/event-driven-architecture.md)
+### 🗞️ [서비스간 이벤트 발행 & 구독 흐름도](docs/event-driven/msa-saga.md)
 
 ## 🐞 에러 핸들링
 ### 🐛 [SpEL 구문 오류 (EL1041E)](docs/error/fix-0_4/1-SpEL%20구문%20오류%20(EL1041E).md)
