@@ -16,7 +16,6 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     open-in-view: false
-    generate-ddl: false
     show-sql: true
     hibernate:
       ddl-auto: create-drop
@@ -32,7 +31,10 @@ spring:
 #  level:
 #    org.springframework.beans.factory.support: DEBUG
 #    org.springframework.data.jpa.repository.config: DEBUG
-
+app:
+  redis:
+    key:
+      soldout-ranking: concert:soldout:ranking
 ---
 spring.config.activate.on-profile: local, test
 

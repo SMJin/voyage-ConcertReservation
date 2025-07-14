@@ -3,6 +3,7 @@ package kr.hhplus.be.server.concert.application.service;
 import kr.hhplus.be.server.common.aop.annotation.DistributedLock;
 import kr.hhplus.be.server.common.response.error.CustomException;
 import kr.hhplus.be.server.concert.application.dto.ReserveSeatRequest;
+import kr.hhplus.be.server.concert.application.event.ReservationCreatedEvent;
 import kr.hhplus.be.server.concert.application.port.in.ReserveSeatUseCase;
 import kr.hhplus.be.server.concert.application.port.out.ReservationLockPort;
 import kr.hhplus.be.server.concert.application.port.out.ReservationPort;
@@ -10,6 +11,7 @@ import kr.hhplus.be.server.concert.domain.Reservation;
 import kr.hhplus.be.server.concert.domain.Seat;
 import kr.hhplus.be.server.concert.application.port.out.SeatPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -25,6 +27,8 @@ public class ReserveSeatService implements ReserveSeatUseCase {
     private final SeatPort seatPort;
     private final ReservationPort reservationPort;
     private final ReservationLockPort reservationLockPort;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 좌석 예약 서비스
@@ -67,7 +71,8 @@ public class ReserveSeatService implements ReserveSeatUseCase {
         // - 5분간 결제 가능하도록 Redis에 좌석 락킹
         // - 결제 완료 시 releaseSeat()로 해제
         // - 5분 후 자동 만료로 안전장치
-        reservationLockPort.lockSeat(request.getSeatId(), userId, Duration.ofMinutes(5));
+//        reservationLockPort.lockSeat(request.getSeatId(), userId, Duration.ofMinutes(5));
+        eventPublisher.publishEvent(new ReservationCreatedEvent(request.getSeatId(), userId));
 
         // 6단계: 좌석 락 해제
         // 메서드 종료(트랜잭션 커밋) 후 자동으로 좌석 락 해제

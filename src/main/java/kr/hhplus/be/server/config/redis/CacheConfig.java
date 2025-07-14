@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.config.redis;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
@@ -23,8 +24,8 @@ public class CacheConfig {
     @Primary // 기본 캐시 매니저로 설정
     @Bean
     public CacheManager compositeCacheManager( // 복합 캐시 매니저 설정
-            CacheManager caffeineManager,
-            CacheManager redisManager
+            @Qualifier("caffeineCacheManager") CacheManager caffeineManager,
+            @Qualifier("cacheManager") CacheManager redisManager
     ) {
         CompositeCacheManager manager = new CompositeCacheManager(caffeineManager, redisManager);
         manager.setFallbackToNoOpCache(false); // 캐시 없으면 예외
